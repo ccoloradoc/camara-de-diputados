@@ -2,8 +2,8 @@ echo "//////////////////////////////////////////////////////////////////////"
 echo "                   IMPORTING VOTES "
 echo "//////////////////////////////////////////////////////////////////////"
 
-for i in `seq 1 10`;
+for i in `seq 1 100`;
 do
   echo ">> Importing batch $(($i))"
-  eval node scripts/scrape-votes.js from=$((($i - 1) * 100 + 1)) to=$(($i * 100 ))
+  eval node scripts/scrape-votes.js from=$((($i - 1) * 10 + 1)) to=$(($i * 10 ))
 done
