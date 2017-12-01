@@ -4,7 +4,7 @@ module.exports = function(sequelize, DataTypes) {
   var Attendance = sequelize.define("Attendance", {
     attendance: { type: DataTypes.STRING, name: 'attendance' },
     attendanceDate: { type: DataTypes.DATE, name: 'attendance_date' },
-    sessionId: { type: DataTypes.INTEGER, name: 'sessionId' }
+    SessionId: { type: DataTypes.INTEGER, name: 'SessionId' }
   }, {
     classMethods: {
       associate: function(models) {
