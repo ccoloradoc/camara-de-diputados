@@ -1,21 +1,24 @@
 default: all
 
-all: mapping deputies attendance initiatives votes extract
+all: log mapping deputies attendance initiatives votes extract
 
-mapping:
-	./mapping.sh
+log:
+	mkdir -p log
 
-deputies:
-	./deputies.sh
+mapping: log
+	./mapping.sh 2>&1 | tee log/mapping.log
 
-attendance:
-	./attendance.sh
+deputies: log
+	./deputies.sh 2>&1 | tee log/deputies.log
 
-initiatives: 
-	./initiatives.sh
+attendance: log
+	./attendance.sh 2>&1 | tee log/attendance.log
 
-votes: deputies
-	./votes.sh
+initiatives: log
+	./initiatives.sh 2>&1 | tee log/initiatives.log
 
-extract: mapping deputies attendance initiatives votes
-	./extract.sh
+votes: log
+	./votes.sh 2>&1 | tee log/votes.log
+
+extract: log
+	./extract.sh 2>&1 | tee log/extract.log

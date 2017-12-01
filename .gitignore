@@ -1,5 +1,6 @@
 db
 app/node_modules
+app/log
 app/data/*
 !app/data/*.zip
 app/*.sqlite

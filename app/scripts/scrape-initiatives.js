@@ -1,10 +1,11 @@
-var request = require('retry-request');
-var cheerio = require('cheerio');
-var async = require('async');
-var fs = require('fs');
-var iconv  = require('iconv-lite');
-var models = require("./models");
-var argv = require("./helper/arguments");
+const cheerio = require('cheerio');
+const async = require('async');
+const fs = require('fs');
+const iconv  = require('iconv-lite');
+const models = require("./models");
+const request = require('./helper/request');
+const { decompose } = require('./helper/utils');
+const argv = require("./helper/arguments");
 
 var parseDate = function(stringDate) {
   //We do not make anything for undefined
@@ -24,28 +25,6 @@ var parseDate = function(stringDate) {
   }
 }
 
-var requestWrap = function(options, callback) {
-  request(options, function(error, response, html) {
-    if(!error) {
-      callback(error, response, html)
-    } else {
-      console.log('Second attempt')
-      // Second attempt
-      request(options, function(error, response, html) {
-        if(!error) {
-          callback(error, response, html)
-        } else {
-          console.log('Third attempt')
-          // Second attempt
-          request(options, function(error, response, html) {
-            callback(error, response, html)
-          });
-        }
-      });
-    }
-  });
-}
-
 models.sequelize.sync().then(function () {
   // Reading deputies session list
   var readDeputy = function(index, next) {
@@ -57,7 +36,7 @@ models.sequelize.sync().then(function () {
         noResponseRetries: 5,
         retries: 5
     }
-    requestWrap(options, function(error, response, html) {
+    request(options, function(error, response, html) {
       if(!error){
           var $ = cheerio.load(iconv.decode(new Buffer(html), 'ISO-8859-1'));
           deputy.sessions = [];
@@ -78,6 +57,7 @@ models.sequelize.sync().then(function () {
 
   // Reading deputy initiatives per session listing
   var readInitiatives = function(session, callback) {
+    let info = decompose(session.url);
     var options =  {
         encoding: null,
         method: 'GET',
@@ -85,8 +65,7 @@ models.sequelize.sync().then(function () {
         noResponseRetries: 10,
         retries: 10
     }
-    requestWrap(options, function(error, response, html) {
-        let sessionId = /pert=(\d+)/.exec(session.url)[1];
+    request(options, function(error, response, html) {
         if(!error){
           var $ = cheerio.load(iconv.decode(new Buffer(html), 'ISO-8859-1'));
           initiatives = [];
@@ -107,7 +86,7 @@ models.sequelize.sync().then(function () {
                     initiatives[initiatives.length - 1].name = name.substr(0,name.length < 255 ? name.length : 255).toLowerCase();
                     initiatives[initiatives.length - 1].longName = name;
                 } else {
-                  console.log(" !!Could not parse: <" + text + ">");
+                  console.log(" !!No se pudo procesar: <" + text + ">");
                 }
 
                 //Relation
@@ -125,7 +104,7 @@ models.sequelize.sync().then(function () {
                   initiatives[initiatives.length - 1].comisionDate = parseDate(comision[1]);
                   initiatives[initiatives.length - 1].comision = comision[2];
                 } else {
-                  console.log(" !Could not parse: <" + text + ">");
+                  console.log(" !No se pudo procesar: <" + text + ">");
                 }
                 break;
               case 2:
@@ -138,16 +117,16 @@ models.sequelize.sync().then(function () {
                     initiatives[initiatives.length - 1].statusDate = parseDate(tra[2]);
                     initiatives[initiatives.length - 1].publishedDate = parseDate(tra[3]);
                 } else {
-                  console.log(" !Could not parse: <" + text + ">");
+                  console.log(" !No se pudo procesar: <" + text + ">");
                 }
                 break;
             }
           });
-          console.log(` Session ${sessionId} with ${initiatives.length} initialives`);
+          console.log(` Deputy ${info.deputyId} Session ${info.sessionId} with ${initiatives.length} initialives`);
           session.initiatives = initiatives;
           callback(null, session);
         } else {
-          console.log(`ERROR: Session ${sessionId} ${error.code}  http://sitl.diputados.gob.mx/LXIII_leg/${session.url}`);
+          console.log(` ERROR: Deputy ${info.deputyId} Session ${info.sessionId} ${error.code}  http://sitl.diputados.gob.mx/LXIII_leg/${session.url}`);
           session.initiatives = [];
           callback(null, session);
         }

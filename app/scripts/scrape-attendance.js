@@ -1,10 +1,11 @@
-var request = require('retry-request');
-var cheerio = require('cheerio');
-var async = require('async');
-var fs = require('fs');
-var iconv  = require('iconv-lite');
-var models = require("./models");
-var argv = require("./helper/arguments");
+const cheerio = require('cheerio');
+const async = require('async');
+const fs = require('fs');
+const iconv  = require('iconv-lite');
+const models = require("./models");
+const request = require('./helper/request');
+const { decompose } = require('./helper/utils');
+const argv = require("./helper/arguments");
 
 var parseDate = function(stringDate) {
   //We do not make anything for undefined
@@ -59,6 +60,7 @@ models.sequelize.sync().then(function () {
 
   // Access attenance for a deputy/session
   var readInitiatives = function(deputyId, session, callback) {
+    let info = decompose(session.url);
     var options =  {
         encoding: null,
         method: 'GET',
@@ -69,7 +71,6 @@ models.sequelize.sync().then(function () {
     request(options, function(error, response, html) {
         if(!error){
             var $ = cheerio.load(iconv.decode(new Buffer(html), 'ISO-8859-1'));
-            session.id = /pert=(\d+)/.exec(session.url)[1];
             attendance = [];
 
             $('table table table table').each(function(index) {
@@ -92,11 +93,11 @@ models.sequelize.sync().then(function () {
               })
             });
 
-            console.log(`Request deputy: ${deputyId} season ${session.id} attendance ${attendance.length}`);
+            console.log(`Request deputy: ${info.deputyId} season ${info.sessionId} attendance ${attendance.length}`);
             session.attendance = attendance;
             callback(null, session);
         } else {
-          console.log(`ERROR: Deputy ${deputyId} session ${session.id} with ${error.code} -------------------------------------------------------------------------`);
+          console.log(`ERROR: Deputy ${info.deputyId} session ${session.id} with ${error.code} -------------------------------------------------------------------------`);
           callback(null, session);
         }
     });

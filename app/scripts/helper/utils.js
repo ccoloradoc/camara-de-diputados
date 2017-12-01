@@ -6,6 +6,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = {
+  decompose: function(url) {
+    let regex = /iddipt=(\d+).pert=(\d+)/.exec(url);
+    return {
+      deputyId: regex[1],
+      sessionId: regex[2]
+    };
+  },
   normalize: function(r) {
     r = r.replace(new RegExp(/[àáâãäå]/g),"a");
     r = r.replace(new RegExp(/[èéêë]/g),"e");
@@ -48,3 +55,4 @@ exports.default = {
 exports.unzip = exports.default.unzip;
 exports.csvToJson = exports.default.csvToJson;
 exports.normalize = exports.default.normalize;
+exports.decompose = exports.default.decompose;

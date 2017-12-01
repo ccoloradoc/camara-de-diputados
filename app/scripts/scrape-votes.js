@@ -1,30 +1,31 @@
-var request = require('request');
-var cheerio = require('cheerio');
-var async = require('async');
-var fs = require('fs');
-var iconv  = require('iconv-lite');
-var models = require("./models");
-var argv = require("./helper/arguments");
+const cheerio = require('cheerio');
+const async = require('async');
+const fs = require('fs');
+const iconv  = require('iconv-lite');
+const models = require("./models");
+const request = require('./helper/request');
+const { decompose } = require('./helper/utils');
+const argv = require("./helper/arguments");
+
+var parseDate = function(stringDate) {
+  //We do not make anything for undefined
+  if(stringDate == undefined)
+  return '';
+  //Parsing
+  var date = /(\d+)\s(\w+)\s(\d+)/.exec(stringDate);
+  if(date != null) {
+    year = date[3];
+    month = "enefebmarabrmayjunjulagosepoctnovdic".indexOf(date[2].substr(0,3).toLocaleLowerCase()) / 3 ;
+    day = date[1];
+
+    return new Date(year, month, day, 0, 0, 0, 0);
+  } else {
+    console.log(' !Unable to parse date: ' + stringDate);
+    return '';
+  }
+}
 
 models.sequelize.sync().then(function () {
-
-  var parseDate = function(stringDate) {
-    //We do not make anything for undefined
-    if(stringDate == undefined)
-      return '';
-    //Parsing
-    var date = /(\d+)\s(\w+)\s(\d+)/.exec(stringDate);
-    if(date != null) {
-      year = date[3];
-      month = "enefebmarabrmayjunjulagosepoctnovdic".indexOf(date[2].substr(0,3).toLocaleLowerCase()) / 3 ;
-      day = date[1];
-
-      return new Date(year, month, day, 0, 0, 0, 0);
-    } else {
-      console.log(' !Unable to parse date: ' + stringDate);
-      return '';
-    }
-  }
 
   var readDeputy = function(index, next) {
     var votations = { id: index, sessions: [] };
@@ -45,13 +46,14 @@ models.sequelize.sync().then(function () {
                 url: $(this).attr('href')
               });;
             });
-
+            console.log(`Reading deputy ${index} with ${votations.sessions.length} sessions`);
             next(null, votations);
         }
     });
   }
 
   var readDecrees = function(session, callback) {
+    let info = decompose(session.url);
 
     var options =  {
         encoding: null,
@@ -61,7 +63,6 @@ models.sequelize.sync().then(function () {
     request(options, function(error, response, html) {
         if(!error){
             var $ = cheerio.load(iconv.decode(new Buffer(html), 'ISO-8859-1'));
-            console.log('Request:' + session.url);
             decrees = [];
 
             $('table tr').each(function(index){
@@ -85,8 +86,8 @@ models.sequelize.sync().then(function () {
               });
 
             });
-
             session.decrees = decrees;
+            console.log(` Reading deputy ${info.deputyId} session ${info.sessionId} with ${session.decrees.length} decrees`);
             callback(null, session);
         }
     });
@@ -95,7 +96,7 @@ models.sequelize.sync().then(function () {
 
   var readDeputiesSessions = function(deputy, callback) {
     console.log('Deputy:' + deputy.id);
-    async.map(deputy.sessions, readDecrees, function(err, sessions) {
+    async.mapSeries(deputy.sessions, readDecrees, function(err, sessions) {
       console.log('Finish processing sessions');
       callback(null, deputy);
     });
@@ -208,7 +209,7 @@ models.sequelize.sync().then(function () {
   }
 
   var sequence = argv();
-  async.map(sequence.ids, readDeputy, function(err, deputies) {
+  async.mapSeries(sequence.ids, readDeputy, function(err, deputies) {
   // //Reading votations from 3 deputy
   // async.times(3, readDeputy , function(err, deputies) {
       //Reading session details
@@ -225,7 +226,7 @@ models.sequelize.sync().then(function () {
         });
 
         //Storing in file for inspection
-        fs.writeFile('./data/json/votations_' + sequence.from + '_' + sequence.to + '.json', JSON.stringify(deputies) , 'utf-8');
+        // fs.writeFile('./data/json/votations_' + sequence.from + '_' + sequence.to + '.json', JSON.stringify(deputies) , 'utf-8');
       });
   });
 

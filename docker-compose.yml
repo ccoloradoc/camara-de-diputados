@@ -3,6 +3,8 @@ services:
   extract:
     build: ./app
     tty: true
+    volumes:
+      - ./app:/camara
     links:
       - mysql
     environment:

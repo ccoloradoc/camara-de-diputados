@@ -1,12 +1,11 @@
-var request = require('request');
-var cheerio = require('cheerio');
-var async = require('async');
-var iconv  = require('iconv-lite');
-var models = require("./models");
-var argv = require("./helper/arguments");
-var KeyGenerator = require("./helper/keygenerator");
-var HashMap = require("./helper/hashmap");
-
+const cheerio = require('cheerio');
+const async = require('async');
+const iconv  = require('iconv-lite');
+const models = require("./models");
+const request = require('./helper/request');
+const argv = require("./helper/arguments");
+const KeyGenerator = require("./helper/keygenerator");
+const HashMap = require("./helper/hashmap");
 const { normalize } = require("./helper/utils");
 
 var cleanDeputyName = function(name) {
@@ -16,6 +15,7 @@ var cleanDeputyName = function(name) {
   name = name.replace('(no rindieron protesta)', '').trim();
   //remove Licence advice
   name = name.replace('(LICENCIA)','').trim();
+  name = name.replace('(DECESO)','').trim();
   //Remove 'Dip.''
   name = name.substr(name.indexOf('.') + 1, name.lenght).trim();
   return name;
@@ -63,7 +63,8 @@ models.sequelize.sync().then(function () {
         encoding: null,
         method: 'GET',
         url: 'http://sitl.diputados.gob.mx/LXIII_leg/curricula.php?dipt=' + d.id,
-        timeout: 40000
+        noResponseRetries: 5,
+        retries: 5
     }
     request(options, function(err, response, html) {
         if(!err){
@@ -212,7 +213,7 @@ models.sequelize.sync().then(function () {
   var scrapeDeputies = function(callback) {
     //Reading arguments from=X to=Y
     var sequence = argv();
-    async.map(sequence.ids, readDiputado, function(err, bulkDeputies) {
+    async.mapSeries(sequence.ids, readDiputado, function(err, bulkDeputies) {
       let missing = [];
       let deputies = [];
       let seats = [];
