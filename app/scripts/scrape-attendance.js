@@ -87,7 +87,7 @@ models.sequelize.sync().then(function () {
                     DeputyId: deputyId,
                     attendanceDate: parseDate(regex[1] + ' ' + date),
                     attendance: regex[2],
-                    SessionId: session.id
+                    SessionId: info.sessionId
                   })
                 }
               })
