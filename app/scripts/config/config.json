@@ -1,0 +1,29 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "database_development",
+    "dialect": "sqlite",
+    "storage": "representame.dev.sqlite",
+    "logging": false
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "qa",
+    "dialect": "sqlite"
+  },
+  "production": {
+    "username": "camara",
+    "password": "camara",
+    "database": "camara",
+    "host": "mysql",
+    "dialect": "mysql",
+    "port": 3306,
+    "define": {
+        "paranoid": true
+    },
+    "logging": false
+  }
+}

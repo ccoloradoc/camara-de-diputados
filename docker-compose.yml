@@ -1,0 +1,21 @@
+version: "2"
+services:
+  extract:
+    build: ./app
+    tty: true
+    links:
+      - mysql
+    environment:
+      NODE_ENV: production
+  mysql:
+    image: mysql:latest
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+    environment:
+       MYSQL_ROOT_PASSWORD: pass1word
+       MYSQL_DATABASE: camara
+       MYSQL_USER: camara
+       MYSQL_PASSWORD: camara
