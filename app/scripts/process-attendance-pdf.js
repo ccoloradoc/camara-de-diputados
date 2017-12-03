@@ -77,7 +77,7 @@ models.sequelize.sync().then(function () {
                 let status = str.match(/(ASISTENCIA|JUSTIFICADA|INASISTENCIA|CÉDULA|OFICIALCOMISIÓN|PERMISOMESADIRECTIVA)/g);
                 if(names != null && names.length > 2 && status) {
                   let name = names.join(' ').replace(' CÉ','');
-                  console.log(`  - ${name} ${status} `);
+                  console.log(`  - ${name} - ${status} `);
                   attendance.push({
                     name: name,
                     hash: namesKeyGen.generateKeyForTerm(names.join(' '), ' '),
@@ -142,28 +142,31 @@ models.sequelize.sync().then(function () {
 
     var processFiles = function(callback) {
       models.AttendanceFile
-        .findAll({ where: { step: 1 }, limit: 5}) // Find All downloaded files
+        .findAll({ where: { step: 1 }}) // Find All downloaded files
         .then(function(files) {
           async.mapSeries(files, parseFile, function(err, result) {
               var bulkAttendance = [];
               for(i in result) {
                 bulkAttendance = bulkAttendance.concat(result[i]);
               }
-              console.log(` Attempt saving: ${bulkAttendance.length}`)
-              models.AttendanceStg
-                .bulkCreate(bulkAttendance, { ignoreDuplicates: true })
-                .then(function(attendanceStg) {
+              console.log(` Attempt saving: ${bulkAttendance.length}`);
+              while(bulkAttendance.length){
+                console.log(` left ${bulkAttendance.length}`)
+                batch = bulkAttendance.slice(0, bulkAttendance.length > 1000 ? 1000 : bulkAttendance.length);
+                bulkAttendance = bulkAttendance.slice(bulkAttendance.length > 1000 ? 1000 : bulkAttendance.length);
 
-                  //Additional names where not being saved
-                  models.Name
-                    .bulkCreate(namesKeyGen.hashRecord, { ignoreDuplicates: true })
-                    .then(function(names) {
-                      console.log(` ${names.length} names have been saved`);
-                    });
+                models.AttendanceStg
+                  .bulkCreate(batch, { ignoreDuplicates: true });
+                  // .then(function(attendanceStg) {
+                  //   //console.log(` ${attendanceStg.length} attendance have been saved`);
+                  // });
+              }
 
-                  attendanceStg = attendanceStg.map(function(attn) { return attn.get({ plain: true }); })
-                  // console.log(`Saved ${attendanceStg.length}`);
-                });
+              models.Name
+              .bulkCreate(namesKeyGen.hashRecord, { ignoreDuplicates: true })
+              .then(function(names) {
+                console.log(` ${names.length} names have been saved`);
+              });
 
           });
         });
