@@ -140,6 +140,35 @@ models.sequelize.sync().then(function () {
       pdfParser.loadPDF("./data/pdf/" + file.name + ".pdf");
     }
 
+    var processBatch = function(callback) {
+      models.AttendanceFile
+        .findAll({ where: { step: 1 }, limit: 5 }) // Find All downloaded files
+        .then(function(files) {
+          async.mapSeries(files, parseFile, function(err, result) {
+              var bulkAttendance = [];
+              for(i in result) {
+                bulkAttendance = bulkAttendance.concat(result[i]);
+              }
+              console.log(`Saving ${bulkAttendance.length}`);
+              models.AttendanceStg
+                .bulkCreate(bulkAttendance, { ignoreDuplicates: true })
+                .then(function(attendanceStg) {
+
+                  //Additional names where not being saved
+                  models.Name
+                    .bulkCreate(namesKeyGen.hashRecord, { ignoreDuplicates: true })
+                    .then(function(names) {
+                      console.log(` ${names.length} names have been saved`);
+                    });
+
+                  attendanceStg = attendanceStg.map(function(attn) { return attn.get({ plain: true }); })
+                  // console.log(`Saved ${attendanceStg.length}`);
+                });
+
+          });
+        });
+    }
+
     var processFiles = function(callback) {
       models.AttendanceFile
         .findAll({ where: { step: 1 }}) // Find All downloaded files
