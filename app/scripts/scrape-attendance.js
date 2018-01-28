@@ -58,6 +58,29 @@ models.sequelize.sync().then(function () {
     });
   }
 
+  var attendanceDescription = function(name) {
+    switch (name) {
+      case 'A':
+        return 'Asistencia por sistema';
+      case 'AO':
+        return 'Asistencia por Comisión Oficial';
+      case 'PM':
+        return 'Permiso de Mesa Directiva';
+      case 'IV':
+        return 'Inasistencia por Votaciones';
+      case 'AC':
+        return 'Asistencia por cédula';
+      case 'IJ':
+        return 'Inasistencia justificada';
+      case 'I':
+        return 'Inasistencia';
+      case 'NA':
+        return 'No hay registro';
+      default:
+        return '';
+    }
+  }
+
   // Access attenance for a deputy/session
   var readInitiatives = function(deputyId, session, callback) {
     let info = decompose(session.url);
@@ -83,10 +106,12 @@ models.sequelize.sync().then(function () {
               $(this).find('div font').each(function(index) {
                 regex = /([0-9]+)([A-Z]+)/.exec($(this).text());
                 if(regex != null) {
+
                   attendance.push({
                     DeputyId: deputyId,
                     attendanceDate: parseDate(regex[1] + ' ' + date),
                     attendance: regex[2],
+                    description: attendanceDescription(regex[2]),
                     SessionId: info.sessionId
                   })
                 }
