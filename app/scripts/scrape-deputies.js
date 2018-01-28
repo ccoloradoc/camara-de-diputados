@@ -193,6 +193,19 @@ models.sequelize.sync().then(function () {
     });
   }
 
+  var loadCirc = function(callback) {
+
+    var queryString  = 'select s.area, max(s.curul) as number from Seats s where s.type = \'Representación proporcional\' group by s.area';
+    models.sequelize
+    .query(queryString, { type: models.sequelize.QueryTypes.SELECT })
+    .then(function(circunscription) {
+      circunscription.forEach((c) => {
+        pluriHashMap.put('Representación proporcional' + '-' + c.area, c.number + 1);
+      });
+      callback(null, true);
+    });
+  }
+
   var bulkCreateDeputies = function(seats, deputies) {
     models.Seat
     .bulkCreate(seats, { ignoreDuplicates: true })
@@ -260,7 +273,7 @@ models.sequelize.sync().then(function () {
 
   }
 
-  async.series([loadNamesHash, loadDistricts, scrapeDeputies], function(err, results) {
+  async.series([loadNamesHash, loadDistricts, loadCirc, scrapeDeputies], function(err, results) {
     console.log('Finished');
   });
 
