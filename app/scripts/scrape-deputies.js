@@ -131,7 +131,7 @@ models.sequelize.sync().then(function () {
               } else { //First time we process this seat
                 // console.log('First processing')
                 var plurinominal = 1;
-                var key = seat.type + '-' + seat.area;
+                var key = seat.type + '-' + seat.area; // Key for circunscription
                 if(pluriHashMap.containsKey(key)) {
                   plurinominal = pluriHashMap.get(key);
                 }
@@ -180,12 +180,13 @@ models.sequelize.sync().then(function () {
           districtKeyGen.loadPair(seat.type + '-' + seat.area + '-' + seat.curul, seat.id);
           seatHashMap.put(seat.hash, seat);
           seatHashMap.put(seat.altHash, seat);
-          if(pluriHashMap.containsKey(seat.type + '-' + seat.area)) {
-            var plurinominal = pluriHashMap.get(seat.type + '-' + seat.area);
-            pluriHashMap.put(seat.type + '-' + seat.area, plurinominal + 1);
-          } else {
-            pluriHashMap.put(seat.type + '-' + seat.area, 1);
+          let plurinominal = 1;
+          let key = seat.type + '-' + seat.area;
+          if(pluriHashMap.containsKey(key)) {
+            plurinominal = pluriHashMap.get(key);
           }
+          pluriHashMap.put(key, plurinominal + 1);
+
         }
       });
       callback(null, true);
