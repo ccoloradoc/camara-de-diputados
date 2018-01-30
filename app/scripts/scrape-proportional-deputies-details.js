@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const async = require('async');
+const fs = require('fs');
 const iconv  = require('iconv-lite');
 const models = require("./models");
 const request = require('./helper/request');
@@ -37,7 +38,7 @@ models.sequelize.sync().then(function () {
   var writeSQL = function(items) {
     var content = '';
     items.forEach(item => {
-      content += `update Deputies set active=${item.active} profile='${item.profile}' estudios='${item.estudios}' facebook='${item.facebook}' twitter='${item.twitter}' where hash='${item.hash}';\n`
+      content += `update Deputies set active=${item.active}, profile='${item.profile}', estudios='${item.estudios}', facebook='${item.facebook}', twitter='${item.twitter}' where hash='${item.hash}';\n`
     });
 
     fs.writeFileSync('data/dump/deputy-proportional-contact.sql', content);

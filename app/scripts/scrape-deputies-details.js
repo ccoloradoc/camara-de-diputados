@@ -93,7 +93,7 @@ models.sequelize.sync().then(function () {
   var writeSQL = function(items) {
     var content = '';
     items.forEach(item => {
-      content += `update Deputies set active=${item.active} profile='${item.profile}' estudios='${item.estudios}' facebook='${item.facebook}' twitter='${item.twitter}' where hash='${item.hash}';\n`
+      content += `update Deputies set active=${item.active}, profile='${item.profile}', estudios='${item.estudios}', facebook='${item.facebook}', twitter='${item.twitter}' where hash='${item.hash}';\n`
     });
 
     fs.writeFileSync('data/dump/deputy-contact.sql', content);
