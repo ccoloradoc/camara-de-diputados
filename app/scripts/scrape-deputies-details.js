@@ -21,18 +21,12 @@ models.sequelize.sync().then(function () {
       });
   }
 
-  var bulkCreateDeputies = function(deputies) {
-    models.DeputyDetails
-      .bulkCreate(deputies, { ignoreDuplicates: true })
-      .then(function(deputies) {
-        models.Name
-          .bulkCreate(namesKeyGen.hashRecord, { ignoreDuplicates: true })
-          .then(function(names) {
-            console.log(deputies.length + ' diputados have been saved');
-            console.log(names.length + ' names have been saved');
-          });
+  var bulkCreateDeputies = function() {
+    models.Name
+      .bulkCreate(namesKeyGen.hashRecord, { ignoreDuplicates: true })
+      .then(function(names) {
+        console.log(names.length + ' names have been saved');
       });
-
   }
 
   var readDiputado = function(index, next) {
@@ -108,7 +102,7 @@ models.sequelize.sync().then(function () {
     //Reading arguments from=X to=Y
     var sequence = argv();
     async.mapSeries(sequence.ids, readDiputado, function(err, result) {
-      bulkCreateDeputies(result);
+      bulkCreateDeputies();
       write(result);
     });
 
