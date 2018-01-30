@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const async = require('async');
+const fs = require('fs');
 const iconv  = require('iconv-lite');
 const models = require("./models");
 const request = require('./helper/request');
@@ -63,7 +64,7 @@ models.sequelize.sync().then(function () {
             let deputy = {
               id: index , //Offset elected majority
               displayName: name,
-              alternate: suplente >= 0,
+              active: suplente >= 0,
               profile: $('.representative-link').attr('href'),
               estudios: $('.representative-academics-txt').text(),
               facebook: 'NA',
@@ -89,11 +90,21 @@ models.sequelize.sync().then(function () {
     });
   }
 
+  var writeSQL = function(items) {
+    var content = '';
+    items.forEach(item => {
+      content += `update Deputies set active=${item.active} profile='${item.profile}' estudios='${item.estudios}' facebook='${item.facebook}' twitter='${item.twitter}' where hash='${item.hash}';\n`
+    });
+
+    fs.writeFileSync('data/dump/deputy-contact.sql', content);
+  }
+
   var scrapeDeputies = function(callback) {
     //Reading arguments from=X to=Y
     var sequence = argv();
     async.mapSeries(sequence.ids, readDiputado, function(err, result) {
       bulkCreateDeputies(result);
+      writeSQL(result);
     });
 
   }
