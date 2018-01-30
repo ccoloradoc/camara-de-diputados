@@ -67,6 +67,8 @@ models.sequelize.sync().then(function () {
               active: suplente >= 0,
               profile: $('.representative-link').attr('href'),
               estudios: $('.representative-academics-txt').text(),
+              phone: $('.modal-phone-number').text(),
+              ext: $('.modal-phone-number-ext').text(),
               facebook: 'NA',
               twitter: 'NA',
               hash: namesKeyGen.generateKeyForTerm(name, ' ')
@@ -93,7 +95,7 @@ models.sequelize.sync().then(function () {
   var writeSQL = function(items) {
     var content = '';
     items.forEach(item => {
-      content += `update Deputies set active=${item.active}, profile='${item.profile}', estudios='${item.estudios}', facebook='${item.facebook}', twitter='${item.twitter}' where hash='${item.hash}';\n`
+      content += `update Deputies set active=${item.active}, profile='${item.profile}', estudios='${item.estudios}', facebook='${item.facebook}', twitter='${item.twitter}', phone='${item.phone}', ext='${item.ext}' where hash='${item.hash}';\n`
     });
 
     fs.writeFileSync('data/dump/deputy-contact.sql', content);
