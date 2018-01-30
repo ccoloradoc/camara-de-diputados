@@ -88,7 +88,7 @@ models.sequelize.sync().then(function () {
 
   }
 
-  async.series([scrapeDeputies], function(err, results) {
+  async.series([loadNamesHash, scrapeDeputies], function(err, results) {
     console.log('Finished');
   });
 
