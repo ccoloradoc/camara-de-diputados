@@ -15,6 +15,7 @@ module.exports = function(sequelize, DataTypes) {
     facebook: { type: DataTypes.STRING, name: 'facebook' },
     twitter: { type: DataTypes.STRING, name: 'twitter' },
     phone: { type: DataTypes.STRING, name: 'phone' },
+    ext: { type: DataTypes.STRING, name: 'ext' },
     active: { type: DataTypes.INTEGER, name: 'active' },
     tres: { type: DataTypes.INTEGER, name: 'tres', defaultValue: 0 },
     fiscal: { type: DataTypes.STRING, name: 'fiscal' },

@@ -35,13 +35,16 @@ models.sequelize.sync().then(function () {
 
   }
 
-  var writeSQL = function(items) {
+  var write = function(items) {
+    var csv = '';
     var content = '';
     items.forEach(item => {
-      content += `update Deputies set active=${item.active}, profile='${item.profile}', estudios='${item.estudios}', facebook='${item.facebook}', twitter='${item.twitter}', phone='${item.phone}', ext='${item.ext}' where hash='${item.hash}';\n`
+      content += `update Deputies set active=${item.active}, profile='${item.profile}', estudios='${item.estudios}', facebook='${item.facebook}', twitter='${item.twitter}', phone='${item.phone}', ext='${item.ext}' where hash='${item.hash}';\n`;
+      csv += `${item.id}, '${item.displayName}', ${item.active}, '${item.profile}', '${item.estudios}', '${item.facebook}', '${item.twitter}', '${item.phone}', '${item.ext}', '${item.hash}';\n`;
     });
 
     fs.writeFileSync('data/dump/deputy-proportional-contact.sql', content);
+    fs.writeFileSync('data/dump/deputy-proportional-contact.csv', csv);
   }
 
   var readDiputado = function(index, next) {
@@ -106,7 +109,7 @@ models.sequelize.sync().then(function () {
     var sequence = argv();
     async.mapSeries(sequence.ids, readDiputado, function(err, result) {
       bulkCreateDeputies(result);
-      writeSQL(result);
+      write(result);
     });
 
   }
