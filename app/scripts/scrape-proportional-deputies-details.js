@@ -51,11 +51,19 @@ models.sequelize.sync().then(function () {
             var $ = cheerio.load(iconv.decode(new Buffer(html), 'UTF-8'));
 
             let name = $('.representative-name').text();
+            let suplente = name.indexOf('(');
+
+            if(suplente >= 0) {
+              name = name.replace('(Diputada Suplente)','').trim();
+              name = name.replace('(Diputado Suplente)','').trim();
+            }
+
             console.log(`>> ${name}`);
 
             let deputy = {
               id: index + 300, //Offset elected majority
               displayName: name,
+              alternate: suplente >= 0,
               profile: $('.representative-link').attr('href'),
               estudios: $('.representative-academics-txt').text(),
               facebook: 'NA',
@@ -70,6 +78,8 @@ models.sequelize.sync().then(function () {
               if(link.indexOf('twitter') >= 0)
                 deputy.twitter = link;
             });
+
+            // console.log(deputy);
 
             next(null, deputy);
         } else {
