@@ -22,6 +22,7 @@ echo ">> Merging data"
 
 eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-contact.sql"
 eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-proportional-contact.sql"
+eval "mysql --host mysql -pcamara -u camara -D camara < scripts/sql/data-fix.sql"
 
 echo ">> Downloading pictures"
 eval "node scripts/deputy-pictures.js"
