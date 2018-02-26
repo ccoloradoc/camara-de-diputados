@@ -1,7 +1,7 @@
 # create a file named Dockerfile
 FROM node:7-alpine
 
-RUN apk add --no-cache nano bash && apk add imagemagick && apk add mysql && apk add --update mysql-client && apk add --update alpine-sdk && mkdir /camara
+RUN apk add --no-cache nano bash && apk add mysql && apk add --update mysql-client && apk add --update alpine-sdk && mkdir /camara && apk add imagemagick 
 WORKDIR /camara
 
 COPY . /camara

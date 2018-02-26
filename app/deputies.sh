@@ -20,8 +20,8 @@ eval "node scripts/scrape-proportional-deputies-details.js from=1 to=300"
 
 echo ">> Merging data"
 
-eval "mysql --host mysql -pcamara -u camara -D camara < data/dump/scrape-deputies-details.js"
-eval "mysql --host mysql -pcamara -u camara -D camara < data/dump/deputy-proportional-contact.sql"
+eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-contact.sql"
+eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-proportional-contact.sql"
 
 echo ">> Downloading pictures"
 eval "node scripts/deputy-pictures.js"
