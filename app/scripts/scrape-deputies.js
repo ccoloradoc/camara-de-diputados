@@ -94,6 +94,7 @@ models.sequelize.sync().then(function () {
                   hash = namesKeyGen.generateKeyForTerm(d[param], ' ');
                   if(index == 0) {
                     d['hash'] = hash;
+                    d['slug'] = normalize(d[param].toLowerCase()).replace(/ /g, '-');
                   } else {
                     d['altHash'] = hash;
                   }

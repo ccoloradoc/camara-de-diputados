@@ -94,7 +94,7 @@ models.sequelize.sync().then(function () {
       csv += `${item.id}, '${item.displayName}', ${item.active}, '${item.profile}', '${item.estudios}', '${item.facebook}', '${item.twitter}', '${item.phone}', '${item.ext}', '${item.hash}';\n`;
     });
 
-    fs.writeFileSync('data/dump/deputy-contact.sql', content);
+    fs.writeFileSync('data/sql/deputy-contact.sql', content);
     fs.writeFileSync('data/dump/deputy-contact.csv', csv);
   }
 
