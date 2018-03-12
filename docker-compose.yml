@@ -4,7 +4,8 @@ services:
     build: ./app
     tty: true
     volumes:
-      - ./app/data:/camara/data
+      # - ./app/data:/camara/data
+      - ./app:/camara
     links:
       - mysql
     environment:
@@ -14,8 +15,8 @@ services:
     restart: always
     ports:
       - "3306:3306"
-    volumes:
-      - ./db/mysql:/var/lib/mysql
+    # volumes:
+    #   - ./db/mysql:/var/lib/mysql
     environment:
        MYSQL_ROOT_PASSWORD: pass1word
        MYSQL_DATABASE: camara

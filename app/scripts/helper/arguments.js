@@ -5,10 +5,11 @@ module.exports  = function() {
   var sequence = { ids:[] };
 
   process.argv.forEach(function (val, index, array) {
-    regex = /(\w+)=(\d+)/.exec(val);
+    console.log(val)
+    regex = /(\w+)=([a-z0-9-]+)/.exec(val);
     if(regex != null && regex != undefined) {
       param = regex[1];
-      value = parseInt(regex[2]);
+      value = isNaN(regex[2])? regex[2] : parseInt(regex[2]);
       sequence[param] = value;
     }
   });

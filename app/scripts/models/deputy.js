@@ -10,17 +10,6 @@ module.exports = function(sequelize, DataTypes) {
     picture: { type: DataTypes.STRING, name: 'picture' },
     party: { type: DataTypes.STRING, name: 'party', defaultValue: 'Uknown' },
     alternate: { type: DataTypes.STRING, name: 'alternate' },
-    estudios: { type: DataTypes.STRING, name: 'estudios' },
-    profile: { type: DataTypes.STRING, name: 'profile' },
-    facebook: { type: DataTypes.STRING, name: 'facebook' },
-    twitter: { type: DataTypes.STRING, name: 'twitter' },
-    phone: { type: DataTypes.STRING, name: 'phone' },
-    ext: { type: DataTypes.STRING, name: 'ext' },
-    active: { type: DataTypes.INTEGER, name: 'active' },
-    tres: { type: DataTypes.INTEGER, name: 'tres', defaultValue: 0 },
-    fiscal: { type: DataTypes.STRING, name: 'fiscal' },
-    intereses: { type: DataTypes.STRING, name: 'intereses' },
-    patrimonial: { type: DataTypes.STRING, name: 'patrimonial' },
     hash: { type: DataTypes.STRING, name: 'hash', defaultValue: 0 },
     altHash: { type: DataTypes.STRING, name: 'alt_hash', defaultValue: 0 },
     slug: { type: DataTypes.STRING, name: 'slug'},
@@ -29,8 +18,8 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Deputy.hasMany(models.Attendance, { as: 'attendance'});
-        Deputy.belongsToMany(models.Initiative, { through: models.DeputyInitiative });
+        Deputy.belongsTo(models.Seat);
+        // Deputy.hasOne(models.Profile, { as: 'profile', foreignKey: 'id'});
       }
     }
   });
