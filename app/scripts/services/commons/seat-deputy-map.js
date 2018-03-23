@@ -4,7 +4,10 @@ function seatString(seat) {
 }
 
 class SeatDeputyMap {
-  constructor() {
+  constructor(fixed) {
+    // Fixed scenarios
+    this.fixed = fixed;
+
     // Mapping and reference
     this.seatDeputyMap = {};
     this.seatDeputyIdMap = {};
@@ -66,9 +69,14 @@ class SeatDeputyMap {
   }
 
   map(seat, deputy) {
-    if(this.seatDeputyMap.hasOwnProperty(deputy.hash)) {
+    // LXIII Special scenario, there are 2 plurinominal seats with 3 deputies
+    if(this.fixed.hasOwnProperty(deputy.id)) {
+      console.log('Special scenario ', deputy.id)
+      seat = this.seatDeputyIdMap[this.fixed[deputy.id]];
+    } else if(this.seatDeputyMap.hasOwnProperty(deputy.hash)) {
       seat = this.seatDeputyMap[deputy.hash];
-    } else if(this.seatDeputyMap.hasOwnProperty(deputy.altHash)) {
+    } else if( deputy.id > 500 // there is a mismatch
+      && this.seatDeputyMap.hasOwnProperty(deputy.altHash)) {
       seat = this.seatDeputyMap[deputy.altHash];
     } else {
       let key = this.generateKey(seat);
