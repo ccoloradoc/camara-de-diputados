@@ -13,20 +13,13 @@ done
 eval "node scripts/scrape-deputies.js from=1001 to=1001"
 eval "node scripts/scrape-deputies.js from=1003 to=1003"
 
-echo ">> Scraping quienmerepresenta"
-
-eval "node scripts/scrape-deputies-details.js from=1 to=199"
-eval "node scripts/scrape-proportional-deputies-details.js from=1 to=300"
-
-echo ">> Merging data"
-
-eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-contact.sql"
-eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-proportional-contact.sql"
-eval "mysql --host mysql -pcamara -u camara -D camara < scripts/sql/data-fix.sql"
-
-echo ">> Downloading pictures"
-eval "node scripts/deputy-pictures.js"
-echo ">> Optimizing pictures"
-eval "node scripts/optimize-pictures.js"
-
-eval "tar -cvzf data/storage.tar.gz data/storage"
+# echo ">> Scraping quienmerepresenta"
+#
+# eval "node scripts/scrape-deputies-details.js from=1 to=199"
+# eval "node scripts/scrape-proportional-deputies-details.js from=1 to=300"
+#
+# echo ">> Merging data"
+#
+# eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-contact.sql"
+# eval "mysql --host mysql -pcamara -u camara -D camara < data/sql/deputy-proportional-contact.sql"
+# eval "mysql --host mysql -pcamara -u camara -D camara < scripts/sql/data-fix.sql"
