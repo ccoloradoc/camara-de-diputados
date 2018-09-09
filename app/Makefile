@@ -2,7 +2,7 @@ default: beatrix
 
 all: log mapping deputies attendance initiatives votes extract
 
-cache: cache-deputies cache-deputies-details cache-attendance
+cache: cache-deputies cache-deputy-details cache-attendance
 
 beatrix: log mapping deputies deputies-profile deputies-social deputies-pictures attendance
 
@@ -12,8 +12,8 @@ log:
 cache-deputies:
 	./cache-deputies.sh 2>&1 | tee ./data/log/cache-deputies.log
 
-cache-deputies-details:
-	./cache-deputies-detils.sh 2>&1 | tee ./data/log/cache-deputies-details.log
+cache-deputy-details:
+	./cache-deputy-details.sh 2>&1 | tee ./data/log/cache-deputy-details.log
 
 cache-attendance:
 	./cache-attendance.sh 2>&1 | tee ./data/log/cache-attendance.log

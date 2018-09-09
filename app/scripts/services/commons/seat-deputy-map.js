@@ -70,7 +70,7 @@ class SeatDeputyMap {
 
   map(seat, deputy) {
     // LXIII Special scenario, there are 2 plurinominal seats with 3 deputies
-    if(this.fixed.hasOwnProperty(deputy.id)) {
+    if(this.fixed && this.fixed.hasOwnProperty(deputy.id)) {
       console.log('Special scenario ', deputy.id)
       seat = this.seatDeputyIdMap[this.fixed[deputy.id]];
     } else if(this.seatDeputyMap.hasOwnProperty(deputy.hash)) {
